@@ -1,11 +1,16 @@
 import javax.swing.*;
 
 public class CustomDialogExample {
-    public CustomDialogExample(int gameType) {
-        SwingUtilities.invokeLater(() -> showDialog(gameType));
+    private final GameController gameController;
+    private final GameUI gameUI;
+
+    public CustomDialogExample(GameController gameController, GameUI gameUI) {
+        this.gameController = gameController;
+        this.gameUI = gameUI;
+        SwingUtilities.invokeLater(this::showDialog);
     }
 
-    private void showDialog(int gameType) {
+    private void showDialog() {
         String[] options = {"Replay", "Exit"};
         int choice = JOptionPane.showOptionDialog(
                 null,
@@ -19,9 +24,9 @@ public class CustomDialogExample {
         );
 
         if (choice == 0) {
-            GameController.restartGame();
+            gameController.restartGame(gameUI); // RESTART
         } else {
-            System.exit(0);
+            System.exit(0); // EXIT
         }
     }
 }
