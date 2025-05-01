@@ -3,7 +3,7 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 
-public class Sound {
+public class SoundService {
     public enum SoundTrack {
         MENU_THEME("menu.wav"),
         GAME_THEME("game.wav"),
@@ -22,12 +22,30 @@ public class Sound {
     }
 
     private  Clip bgClip;
+    private long clipTimePosition = 0;
 
+    public void pauseBackgroundMusic() {
+        if (bgClip != null && bgClip.isRunning()) {
+            clipTimePosition = bgClip.getMicrosecondPosition();
+            bgClip.stop();
+        }
+    }
+
+    public void resumeBackgroundMusic() {
+        if (bgClip != null) {
+            try {
+                bgClip.setMicrosecondPosition(clipTimePosition);
+                bgClip.start();
+            } catch (Exception e) {
+                showError("Error resuming music: " + e.getMessage());
+            }
+        }
+    }
     private  void showError(String message) {
         JOptionPane.showMessageDialog(null, message, "ERROR", JOptionPane.ERROR_MESSAGE);
     }
 
-    // ===== Фоновая музыка =====
+
     public  void playMenuTheme() {
         playBackgroundMusic(SoundTrack.MENU_THEME.path);
     }
@@ -59,7 +77,7 @@ public class Sound {
         }
     }
 
-    // ===== Звуковые эффекты =====
+
     public  void playCardClick() {
         playSoundEffect(SoundTrack.CARD_CLICK.path);
     }
@@ -97,4 +115,5 @@ public class Sound {
             showError("Sound error: " + e.getMessage());
         }
     }
+
 }

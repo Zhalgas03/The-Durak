@@ -1,4 +1,10 @@
-package PACKAGE_NAME;
+import java.util.List;
 
-public class GameStateProvider {
+public interface GameStateProvider {
+    List<String> getPlayerHand();
+    List<String> getBotHand();
+    List<String> getDurakHand();
+    String getTrump();
+    Deck getDeck();
 }
+

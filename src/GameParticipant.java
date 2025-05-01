@@ -1,7 +1,7 @@
 import java.util.List;
 import java.util.ArrayList;
 
-public abstract class GameParticipant<T> extends Functions{
+public abstract class GameParticipant<T>{
     protected List<String> hand = new ArrayList<>();
 
     public List<String> getHand() {

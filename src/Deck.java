@@ -15,9 +15,6 @@ public class Deck {
         shuffle();
     }
 
-
-
-
     public void shuffle() {
         Collections.shuffle(cards);//Use the Collections.shuffle method to shuffle the list of cards
     }

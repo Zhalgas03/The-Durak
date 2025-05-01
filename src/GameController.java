@@ -1,79 +1,73 @@
 import java.util.List;
-
-public class GameController {
-    private static final int INITIAL_CARDS_COUNT = 6;
-    private static final Functions.CardComparator CARD_COMPARATOR = new Functions.CardComparator();
-    public static void initGame() {
-        resetGameState();
-        initializeNewGame();
-        Sound.playBackgroundMusic(Variables.getGameSoundPath());
+import java.util.Comparator;
+public class GameController implements GameStateProvider, TurnManagerCallback {
+    private Comparator<String> cardComparator;
+    private final CardService cardService;
+    private GameUI gameUI;
+    private final GameState gameState;
+    private final GameSession game;
+    private final GameInitializer gameInitializer;
+    private final HandSorter handSorter;
+    private final SoundService soundService;
+    private int currentDeckMode = 36;
+    public GameController(
+            GameUI gameUI,
+            GameState gameState,
+            GameSession game,
+            CardService cardService,
+            GameLogicManager gameLogicManager,
+            TurnManager turnManager,
+            SoundService soundService
+    ) {
+        this.gameUI = gameUI;
+        this.gameState = gameState;
+        this.game = game;
+        this.cardService = cardService;
+        this.soundService = soundService;
+        this.gameInitializer = new GameInitializer(new Dealer(), gameState, game, cardService, turnManager, gameUI, this, gameLogicManager);        this.handSorter = new HandSorter();
+        updateCardComparator();
     }
-
-
-    public static void restartGame() {
-        resetGameState();
-        initializeNewGame();
-        GameUI.updateImages();
-        Sound.playBackgroundMusic(Variables.getGameSoundPath());
+    public void setGameUI(GameUI gameUI) {
+        this.gameUI = gameUI;
     }
+    @Override
+    public List<String> getPlayerHand() { return gameState.getPlayerHand(); }
+    @Override
+    public List<String> getBotHand() { return gameState.getBotHand(); }
+    @Override
+    public List<String> getDurakHand() { return gameState.getDurakHand(); }
+    @Override
+    public String getTrump() { return gameState.getTrump(); }
+    @Override
+    public Deck getDeck() { return gameState.getDeck(); }
+    @Override
+    public void setTurn(GameSession.Turn turn) { game.setTurn(turn); }
 
-
-    private static abstract class StartGame<T> {
-        public abstract void startGame(Deck deck, List<T> list, List<T> bot, List<T> durak, String trump);
-    }
-
-    private static class Game extends StartGame<String> {
-        @Override
-        public void startGame(Deck deck,
-                              List<String> playerHand,  // Переименовано из list
-                              List<String> botHand,      // Переименовано из bot
-                              List<String> durak,
-                              String trump) {
-            dealCards(deck, playerHand);
-            dealCards(deck, botHand);
-            dealCards(deck, durak);
-
+    public void setDeckMode(int mode) {
+        if (mode == 36 || mode == 52) {
+            this.currentDeckMode = mode;
         }
-
-        private void dealCards(Deck deck, List<String> target) {
-            for (int i = 0; i < INITIAL_CARDS_COUNT && !deck.isEmpty(); i++) {
-                target.add(String.valueOf(deck.drawCard()));
-            }
-        }
     }
 
-    private static void resetGameState() {
-        // Очистка данных
-        Variables.getList().clear();
-        Variables.dList().clear();
 
-        // Сброс состояния игры
-        Game52.setTurn(Game52.Turn.PLAYER);
-        Game52.deck = new Deck(52);
-        Game52.setBotInstance(new SimpleBot());
+    public void initGame(int deckMode) {
+        setDeckMode(deckMode);
+        gameInitializer.prepareNewGame(this, deckMode);
+        soundService.playGameTheme();
     }
 
-    private static void initializeNewGame() {
-        // Инициализация бота
-        SimpleBot bot = Game52.getBotInstance();
 
-        // Запуск игры
-        Game game = new Game();
-        game.startGame(
-                Game52.deck,
-                Variables.getList(),
-                bot.getHand(),
-                Variables.dList(),
-                Variables.getTrump()
-        );
-
-        // Сортировка карт
-        sortAllHands();
+    public void restartGame() {
+        gameInitializer.prepareNewGame(this, currentDeckMode);
+        gameUI.updateImages();
+        soundService.playGameTheme();
     }
 
-    private static void sortAllHands() {
-        Variables.getList().sort(CARD_COMPARATOR);
-        Game52.getBotInstance().getHand().sort(CARD_COMPARATOR);
-        Variables.dList().sort(CARD_COMPARATOR);
+    public void updateCardComparator() {
+        cardComparator = cardService.createCardComparator(gameState.getTrump());
+    }
+
+    public void sortAllHands() {
+        handSorter.sortHands(gameState.getPlayerHand(), gameState.getBotHand(), gameState.getDurakHand(), cardComparator);
     }
 }

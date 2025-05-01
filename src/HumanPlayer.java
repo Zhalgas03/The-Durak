@@ -1,34 +1,54 @@
 public class HumanPlayer extends GameParticipant<Integer> {
+    private final GameState gameState;
+    private final GameSession game;
+    private final GameUI gameUI;
+    private final GameController gameController;
+    private final CardService cardService;
+    private final GameLogicManager gameLogicManager;
+    public HumanPlayer(GameState gameState,
+                       GameSession game,
+                       GameUI gameUI,
+                       GameController gameController,
+                       CardService cardService,GameLogicManager gameLogicManager) {
+        this.gameState = gameState;
+        this.game = game;
+        this.gameUI = gameUI;
+        this.gameController = gameController;
+        this.cardService = cardService;
+        this.gameLogicManager = gameLogicManager;
+    }
+
     @Override
     public void playCard(Integer card) {
-        int index = Game52.clickedImageIndex;
 
-        String playerCard = Variables.getList().remove(index);
-        Variables.getList().trimToSize();
+        int index = game.getClickedImageIndex();
+
+        String playerCard = gameState.getPlayerHand().remove(index);
 
 
         boolean found = false;
 
-        for (int i = 0; i < Game52.getBotInstance().getHand().size(); i++) {
-            String botCard = Game52.getBotInstance().getHand().get(i);
-            if (Functions.canBeat(playerCard, botCard, Variables.getTrump())) {
-                Game52.getBotInstance().getHand().remove(i);
+        for (int i = 0; i < game.getBotInstance().getHand().size(); i++) {
+            String botCard = game.getBotInstance().getHand().get(i);
+            if (cardService.canBeat(playerCard, botCard, gameState.getTrump())) {
+                game.getBotInstance().getHand().remove(i);
 
 
-                drawCardIfNeeded(Game52.getBotInstance().getHand(), Game52.deck);
-                Game52.setTurn(Game52.Turn.BOT);
+                gameLogicManager.drawCardIfNeeded(game.getBotInstance().getHand(), gameState.getDeck());
+                game.setTurn(GameSession.Turn.BOT);
                 found = true;
                 break;
             }
         }
 
         if (!found) {
-            Game52.getBotInstance().getHand().add(playerCard);
-            Game52.setTurn(Game52.Turn.OPPONENT);
+            game.getBotInstance().getHand().add(playerCard);
+            game.setTurn(GameSession.Turn.OPPONENT);
 
         }
 
-        drawCardIfNeeded(Variables.getList(), Game52.deck);
-        sortAndCheck(Variables.getList(), Game52.getBotInstance().getHand(), Variables.dList());
+        gameLogicManager.drawCardIfNeeded(gameState.getPlayerHand(), gameState.getDeck());
+
+        gameLogicManager.sortAndCheck(gameState.getPlayerHand(), game.getBotInstance().getHand(), gameState.getDurakHand(),gameController, gameUI, gameState.getTrump());
     }
 }

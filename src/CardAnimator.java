@@ -4,12 +4,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class CardAnimator {
-    private static final int ANIMATION_DELAY = 5;
-    private static final int STEP = 1;
-    private static final Cursor HAND_CURSOR = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
-    private static final Cursor DEFAULT_CURSOR = Cursor.getDefaultCursor();
+    private final int ANIMATION_DELAY = 5;
+    private final int STEP = 1;
+    private final Cursor HAND_CURSOR = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+    private final Cursor DEFAULT_CURSOR = Cursor.getDefaultCursor();
 
-    public static void setupCardHoverAnimation(JComponent component, int startY) {
+    public void setupCardHoverAnimation(JComponent component, int startY) {
         final int[] currentY = {startY};
         final Timer timer = new Timer(ANIMATION_DELAY, null);
 
@@ -28,7 +28,7 @@ public class CardAnimator {
         });
     }
 
-    private static void startAnimation(JComponent comp, int[] currentY, int targetY, Timer timer) {
+    private void startAnimation(JComponent comp, int[] currentY, int targetY, Timer timer) {
         timer.stop();
         timer.removeActionListener(timer.getActionListeners().length > 0 ? timer.getActionListeners()[0] : null);
 

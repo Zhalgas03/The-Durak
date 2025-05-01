@@ -1,4 +1,3 @@
-package PACKAGE_NAME;
-
-public class TurnManagerCallback {
+public interface TurnManagerCallback {
+    void setTurn(GameSession.Turn turn);
 }

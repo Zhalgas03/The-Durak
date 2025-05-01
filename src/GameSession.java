@@ -1,93 +1,115 @@
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.InputEvent;
-import java.util.List;
 
-public class Game52 {
-    private  GameState gameState = new GameState(); // теперь
-    private  SimpleBot botInstance;
+public class GameSession {
+    private final GameState gameState;
+    private final GameUI gameUI;
+    private final GameController controller;
+    private SimpleBot botInstance;
+    private boolean imageClicked = false;
+    private int clickedImageIndex = -1;
+    private final CardService cardService;
+    private final GameLogicManager gameLogicManager;
+    private final SoundService soundService;
+    private final TurnManager turnManager;
+    private final int deckMode;
+    public GameSession(
+            SoundService soundService,
+            CardService cardService,
+            GameLogicManager gameLogicManager,
+            TurnManager turnManager,int deckMode
+    ) {
+        this.soundService = soundService;
+        this.cardService = cardService;
+        this.gameLogicManager = gameLogicManager;
+        this.turnManager = turnManager;
 
-    public  void setBotInstance(SimpleBot bot) {
-        botInstance = bot;
+        this.gameState = new GameState();
+        ImageCache imageCache = new ImageCache();
+        this.controller = new GameController(
+                null,
+                gameState,
+                this,
+                cardService,
+                gameLogicManager,
+                turnManager,
+                soundService
+        );
+        this.deckMode = deckMode;
+
+        this.gameUI = new GameUI(gameState, this, soundService, imageCache, controller);
+
+        this.controller.setGameUI(gameUI);
+
+        this.botInstance = new SimpleBot(
+                gameState,
+                this,
+                gameUI,
+                controller,
+                cardService,
+                gameLogicManager
+        );
     }
 
 
-    public  SimpleBot getBotInstance() {
-        return botInstance;
-    }
-
-
-
-
-
-    // ========== GLOBAL STATE ==========
-    private  boolean imageClicked = false;
-    public  int clickedImageIndex = -1;
-
-
-
-    // ========== TURN ENUM ==========
-    public enum Turn {
-        PLAYER,
-        BOT,
-        OPPONENT;
-    }
-    public  final int PLAYER_TURN = 1;
-    public  final int BOT_TURN = 2;
-    public  final int OPPONENT_TURN = 3;
-
-    // ========== GAME INIT / FLOW ==========
-    private  GameUI gameUI;
-
-
-    public static void main(String[] args) {
+    public void startGame() {
+        gameState.setDeck(new Deck(deckMode));
         SwingUtilities.invokeLater(() -> {
-            Game52 game = new Game52();
-            game.gameUI = new GameUI(game.gameState, game); // передаем game
-            game.gameUI.createAndShowGUI();
-            game.gameUI.updateImages();
-            GameController controller = new GameController(game.gameUI, game.gameState,game);
-            controller.initGame();
+            gameUI.createAndShowGUI();
+            gameUI.updateImages();
+            controller.initGame(deckMode);
         });
     }
 
-
-    public void setTurn(Game52.Turn t) {
-        gameState.setTurn(t);
-        if (t == Turn.BOT && botInstance != null) {
-            SwingUtilities.invokeLater(() -> {
-                botInstance.playCard(null);
-                UIUtils.refresh(false, gameUI, this);
-            });
-        }
-    }
-    public  void waitForNextClick() {//makes imageclicked false to wait for opponent's move
-        imageClicked = false;
-        clickedImageIndex = -1;
-    }
-
-    public void onImageClick(int index) {
-        GameParticipant<Integer> player = new HumanPlayer(gameState, this);
-        GameParticipant<Integer> bot = this.getBotInstance();
-        GameParticipant<Integer> durak = new LastBot(gameState,this);
+    public void handleCardClick(int index) {
         if (!imageClicked) {
             clickedImageIndex = index;
             imageClicked = true;
             switch (gameState.getTurn()) {
                 case PLAYER -> {
-                    player.playCard(null);
-                    UIUtils.refresh(false, gameUI, this);
+                    new HumanPlayer(gameState, this, gameUI, controller,cardService,gameLogicManager).playCard(null);
                 }
                 case BOT -> {
-                    bot.playCard(null);
-                    UIUtils.refresh(false, gameUI, this);
+                    botInstance.playCard(null);
+
                 }
                 case OPPONENT -> {
-                    durak.playCard(null);
-                    UIUtils.refresh(false, gameUI, this);
+                    new LastBot(gameState, this, gameUI, controller,cardService,gameLogicManager).playCard(null);
+
                 }
             }
+            gameUI.updateImages();
+            resetForNextMove();
         }
     }
+
+    public  void resetForNextMove() {
+        imageClicked = false;
+        clickedImageIndex = -1;
+    }
+
+    public void setBotInstance(SimpleBot bot) {botInstance = bot;}
+    public SimpleBot getBotInstance() {return botInstance;}
+    public int getClickedImageIndex() { return clickedImageIndex; }
+    public void initBotInstance() {
+
+        this.botInstance = new SimpleBot(gameState, this, gameUI, controller,cardService,gameLogicManager);
+    }
+
+    public enum Turn {
+        PLAYER, BOT, OPPONENT;
+    }
+
+    public void setTurn(GameSession.Turn t) {
+        gameState.setTurn(t);
+        if (t == Turn.BOT && botInstance != null) {
+            SwingUtilities.invokeLater(() -> {
+                botInstance.playCard(null);
+                gameUI.updateImages();
+                resetForNextMove();
+            });
+        }
+    }
+
+
 
 }
