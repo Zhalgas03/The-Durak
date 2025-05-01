@@ -47,14 +47,14 @@ public class SoundService {
 
 
     public  void playMenuTheme() {
-        playBackgroundMusic(SoundTrack.MENU_THEME.path);
+        playSoundEffect(SoundTrack.MENU_THEME.path,true);
     }
 
     public  void playGameTheme() {
-        playBackgroundMusic(SoundTrack.GAME_THEME.path);
+        playSoundEffect(SoundTrack.GAME_THEME.path,true);
     }
 
-    public  void playBackgroundMusic(String path) {
+    public  void playSoundEffect(String path, boolean loop) {
         stopBackgroundMusic();
         try {
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(new File(path));

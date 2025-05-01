@@ -26,9 +26,7 @@ public class Deck {
     public int size() {
         return cards.size();// Return the number of cards remaining in the deck
     }
-    public List<Card> getCards() {
-        return cards;
-    }
+
     public boolean isEmpty() {
         return cards.isEmpty();
     }
