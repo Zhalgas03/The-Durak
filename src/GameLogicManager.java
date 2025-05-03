@@ -44,7 +44,7 @@ public class GameLogicManager {
     private void handleWin(int winnerCode, GameController controller, GameUI gameUI) {
         ResultHandler resultHandler = new ResultHandler(soundService);
         resultHandler.winner(winnerCode);
-        new GameOverDialog(controller, gameUI);
+        new GameOverDialog(controller);
     }
 
     public void drawCardIfNeeded(List<String> hand, Deck deck) {

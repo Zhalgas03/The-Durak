@@ -8,12 +8,12 @@ public class GameUI {
     private final CardAnimator cardAnimator = new CardAnimator();
     private JFrame frame;
     private JPanel panel;
-    private GameState gameState;
-    private GameSession game;
+    private final GameState gameState;
+    private final GameSession game;
     private final SoundService soundService;
     private final ImageCache imageCache;
-    private GameController controller;
-    private boolean isPaused = false;
+    private final GameController controller;
+
 
     public GameUI(GameState gameState, GameSession game, SoundService soundService, ImageCache imageCache,GameController controller) {
         this.gameState = gameState;
@@ -23,7 +23,7 @@ public class GameUI {
         this.controller = controller;
     }
 
-    public class DoubleBufferedPanel extends JPanel {
+    private static class DoubleBufferedPanel extends JPanel {
         public DoubleBufferedPanel(LayoutManager layout) {
             super(layout);
             setDoubleBuffered(true);
@@ -82,13 +82,14 @@ public class GameUI {
 
 
         PauseOverlay pauseOverlay = new PauseOverlay(frame, soundService, controller);
-        layeredPane.add(pauseOverlay, JLayeredPane.POPUP_LAYER);
+        frame.setGlassPane(pauseOverlay);
+        pauseOverlay.setVisible(false);
 
         burgerButton.addActionListener(e -> {
             soundService.playMoveSound();
-            isPaused = !isPaused;
-            pauseOverlay.setVisible(isPaused);
-            if (isPaused) {
+            boolean overlayVisible = !pauseOverlay.isVisible();
+            pauseOverlay.setVisible(overlayVisible);
+            if (overlayVisible) {
                 soundService.pauseBackgroundMusic();
             } else {
                 soundService.resumeBackgroundMusic();
@@ -129,22 +130,22 @@ public class GameUI {
 
         JLabel deckCountLabel = new JLabel("Deck size:");
         JLabel deckCountLabel2 = new JLabel(String.valueOf(gameState.getDeck().size()));
-        JLabel tlabel = getjLabel();
+        JLabel textLabel = getjLabel();
 
         Font pixelFont = GameStyle.loadGameFont(24f);
         deckCountLabel.setFont(pixelFont);
         deckCountLabel2.setFont(GameStyle.loadGameFont(48f));
-        tlabel.setFont(pixelFont);
+        textLabel.setFont(pixelFont);
 
         deckCountLabel.setForeground(Color.WHITE);
         deckCountLabel2.setForeground(Color.WHITE);
-        tlabel.setForeground(Color.WHITE);
+        textLabel.setForeground(Color.WHITE);
 
-        tlabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        textLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         deckCountLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         deckCountLabel2.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        info.add(tlabel);
+        info.add(textLabel);
         info.add(Box.createRigidArea(new Dimension(0, 20)));
         info.add(deckCountLabel);
         info.add(deckCountLabel2);
@@ -223,8 +224,8 @@ public class GameUI {
     }
 
     private JLabel getjLabel() {
-        ImageIcon trumpik = new ImageIcon(gameState.getTrumpImagePath());
-        return new JLabel(trumpik);
+        ImageIcon trumpIcon = new ImageIcon(gameState.getTrumpImagePath());
+        return new JLabel(trumpIcon);
     }
 
     private ImageIcon getMidIcon() {

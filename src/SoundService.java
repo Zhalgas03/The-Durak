@@ -8,7 +8,7 @@ public class SoundService {
         MENU_THEME("menu.wav"),
         GAME_THEME("game.wav"),
         CARD_CLICK("click.wav"),
-        CARD_DENY("deny.wav"),
+        CARD_DENY("deny2.wav"),
         CARD_MOVE("move.wav"),
         CARD_SELECT("handle.wav"),
         WIN_FANFARE("winner.wav"),

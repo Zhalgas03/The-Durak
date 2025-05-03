@@ -3,11 +3,11 @@ import java.awt.*;
 
 public class GameOverDialog {
     private final GameController gameController;
-    private final GameUI gameUI;
 
-    public GameOverDialog(GameController gameController, GameUI gameUI) {
+
+    public GameOverDialog(GameController gameController) {
         this.gameController = gameController;
-        this.gameUI = gameUI;
+
         SwingUtilities.invokeLater(this::showDialog);
     }
 

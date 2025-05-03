@@ -48,7 +48,6 @@ public class HumanPlayer extends GameParticipant<Integer> {
         }
 
         gameLogicManager.drawCardIfNeeded(gameState.getPlayerHand(), gameState.getDeck());
-
         gameLogicManager.sortAndCheck(gameState.getPlayerHand(), game.getBotInstance().getHand(), gameState.getDurakHand(),gameController, gameUI, gameState.getTrump());
     }
 }

@@ -3,9 +3,9 @@ import java.util.List;
 import java.util.Random;
 
 public class GameState {
-    private List<String> playerHand = new ArrayList<>();
-    private List<String> botHand = new ArrayList<>();
-    private List<String> durakHand = new ArrayList<>();
+    private final List<String> playerHand = new ArrayList<>();
+    private final List<String> botHand = new ArrayList<>();
+    private final List<String> durakHand = new ArrayList<>();
     private Deck deck;
     private GameSession.Turn turn = GameSession.Turn.PLAYER;
     private String trump;
@@ -14,32 +14,16 @@ public class GameState {
     public List<String> getPlayerHand() {
         return playerHand;
     }
-
-    public void setPlayerHand(List<String> playerHand) {
-        this.playerHand = playerHand;
-    }
-
     public List<String> getBotHand() {
         return botHand;
     }
-
-
-    public void setBotHand(List<String> botHand) {
-        this.botHand = botHand;
-    }
-
     public List<String> getDurakHand() {
         return durakHand;
-    }
-
-    public void setDurakHand(List<String> durakHand) {
-        this.durakHand = durakHand;
     }
 
     public Deck getDeck() {
         return deck;
     }
-
     public void setDeck(Deck deck) {
         this.deck = deck;
     }
@@ -47,7 +31,6 @@ public class GameState {
     public GameSession.Turn getTurn() {
         return turn;
     }
-
     public void setTurn(GameSession.Turn turn) {
         this.turn = turn;
     }

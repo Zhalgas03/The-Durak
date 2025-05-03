@@ -147,7 +147,7 @@ public class GameMenu extends JFrame {
                     getRootPane().setEnabled(true);
                 }).start();
                 break;
-            case 2: soundService.playCardDenied();; break;
+            case 2: soundService.playCardDenied(); break;
             case 3: System.exit(0);
         }
     }
@@ -158,10 +158,7 @@ public class GameMenu extends JFrame {
     private void startGame(int deckMode) {
         soundService.stopBackgroundMusic();
         dispose();
-        new Thread(() -> {
-
-            Main.main(new String[]{String.valueOf(deckMode)});
-        }).start();
+        new Thread(() -> Main.main(new String[]{String.valueOf(deckMode)})).start();
     }
 
     public static void main(String[] args) {

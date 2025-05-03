@@ -65,17 +65,9 @@ public class GameSession {
             clickedImageIndex = index;
             imageClicked = true;
             switch (gameState.getTurn()) {
-                case PLAYER -> {
-                    new HumanPlayer(gameState, this, gameUI, controller,cardService,gameLogicManager).playCard(null);
-                }
-                case BOT -> {
-                    botInstance.playCard(null);
-
-                }
-                case OPPONENT -> {
-                    new LastBot(gameState, this, gameUI, controller,cardService,gameLogicManager).playCard(null);
-
-                }
+                case PLAYER -> new HumanPlayer(gameState, this, gameUI, controller, cardService, gameLogicManager).playCard(null);
+                case BOT -> botInstance.playCard(null);
+                case OPPONENT -> new LastBot(gameState, this, gameUI, controller, cardService, gameLogicManager).playCard(null);
             }
             gameUI.updateImages();
             resetForNextMove();
@@ -90,13 +82,10 @@ public class GameSession {
     public void setBotInstance(SimpleBot bot) {botInstance = bot;}
     public SimpleBot getBotInstance() {return botInstance;}
     public int getClickedImageIndex() { return clickedImageIndex; }
-    public void initBotInstance() {
 
-        this.botInstance = new SimpleBot(gameState, this, gameUI, controller,cardService,gameLogicManager);
-    }
 
     public enum Turn {
-        PLAYER, BOT, OPPONENT;
+        PLAYER, BOT, OPPONENT
     }
 
     public void setTurn(GameSession.Turn t) {

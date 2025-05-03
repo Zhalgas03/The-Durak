@@ -2,7 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyAdapter;
 public class PauseOverlay extends JPanel {
     private final SoundService soundService;
     private final GameController controller;
@@ -14,6 +15,16 @@ public class PauseOverlay extends JPanel {
         this.frame = frame;
 
         initOverlay();
+        enableEventBlocking();
+    }
+    @Override
+    protected void processMouseEvent(MouseEvent e) {
+        e.consume();
+    }
+
+    @Override
+    protected void processKeyEvent(KeyEvent e) {
+        e.consume();
     }
 
     private void initOverlay() {
@@ -26,26 +37,33 @@ public class PauseOverlay extends JPanel {
         setVisible(false);
     }
 
+    private void enableEventBlocking() {
+        addMouseListener(new MouseAdapter() {});
+        addKeyListener(new KeyAdapter() {});
+        setFocusable(true);
+        requestFocusInWindow();
+    }
+
     private JPanel createMenuPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(new Color(0, 0, 0, 200));
         panel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 4));
-        panel.setPreferredSize(new Dimension(600, 200));
+        panel.setPreferredSize(new Dimension(580, 250));
 
         JLabel pausedLabel = new JLabel("Paused");
-        pausedLabel.setFont(GameStyle.loadGameFont(64f));
+        pausedLabel.setFont(GameStyle.loadGameFont(75f));
         pausedLabel.setForeground(Color.WHITE);
         pausedLabel.setAlignmentX(CENTER_ALIGNMENT);
 
         JPanel buttonRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 10));
         buttonRow.setOpaque(false);
 
-        buttonRow.add(createIconButton("style/cards/resume.png", this::resumeGame));
-        buttonRow.add(createIconButton("style/cards/restart.png", this::restartGame));
-        buttonRow.add(createIconButton("style/cards/home.png", this::goToMenu));
+        buttonRow.add(createTextLabel("Resume", this::resumeGame));
+        buttonRow.add(createTextLabel("Restart", this::restartGame));
+        buttonRow.add(createTextLabel("Menu", this::goToMenu));
 
-        panel.add(Box.createVerticalStrut(20));
+        panel.add(Box.createVerticalStrut(50));
         panel.add(pausedLabel);
         panel.add(Box.createVerticalStrut(30));
         panel.add(buttonRow);
@@ -53,21 +71,32 @@ public class PauseOverlay extends JPanel {
         return panel;
     }
 
-    private JButton createIconButton(String path, Runnable action) {
-        ImageIcon icon = new ImageIcon(path);
-        Image scaledImage = icon.getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH);
-        JButton button = new JButton(new ImageIcon(scaledImage));
-        button.setPreferredSize(new Dimension(64, 64));
-        button.setContentAreaFilled(false);
-        button.setBorderPainted(false);
-        button.setFocusPainted(false);
-        button.addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent e) {
+    private JLabel createTextLabel(String text, Runnable action) {
+        JLabel label = new JLabel(text);
+        label.setFont(GameStyle.loadGameFont(30f));
+        label.setForeground(Color.WHITE);
+        label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+
+        label.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
                 soundService.playMoveSound();
+                action.run();
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                label.setForeground(new Color(255, 255,0));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                label.setForeground(Color.WHITE);
             }
         });
-        button.addActionListener(e -> action.run());
-        return button;
+
+        return label;
     }
 
     private void resumeGame() {
