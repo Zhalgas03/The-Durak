@@ -17,7 +17,9 @@ public abstract class GameParticipant<T>{
     public void trimHand() {
         ((ArrayList<String>) hand).trimToSize();
     }
-
+    public boolean isAuto() {
+        return false;
+    }
     public abstract void playCard(T context);
 }
 

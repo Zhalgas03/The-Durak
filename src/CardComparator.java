@@ -11,20 +11,13 @@ public class CardComparator implements Comparator<String> {
 
     @Override
     public int compare(String card1, String card2) {
-        boolean isTrump1 = cardService.getCardSuit(card1).equals(trumpSuit);
-        boolean isTrump2 = cardService.getCardSuit(card2).equals(trumpSuit);
+        return Comparator
+                .comparingInt(this::isTrumpAsInt)
+                .thenComparingInt(cardService::getCardRank)
+                .compare(card1, card2);
+    }
 
-        if (isTrump1 && isTrump2) {
-            return Integer.compare(
-                    cardService.getCardRank(card1),
-                    cardService.getCardRank(card2)
-            );
-        }
-        if (isTrump1) return 1;
-        if (isTrump2) return -1;
-        return Integer.compare(
-                cardService.getCardRank(card1),
-                cardService.getCardRank(card2)
-        );
+    private int isTrumpAsInt(String card) {
+        return cardService.getCardSuit(card).equals(trumpSuit) ? 1 : 0;
     }
 }

@@ -34,14 +34,18 @@ public class GameLogicManager {
                              List<String> durakList,
                              GameController controller,
                              GameUI gameUI) {
-        if (playerList.isEmpty()) {
-            handleWin(1, controller, gameUI);
-        } else if (botList.isEmpty() || durakList.isEmpty()) {
-            handleWin(2, controller, gameUI);
+        boolean playerWon = playerList.isEmpty();
+        boolean botsWon = botList.isEmpty() && durakList.isEmpty();
+
+        if (playerWon) {
+            handleWin(1, controller);
+        } else if (botsWon) {
+            handleWin(2, controller);
         }
     }
 
-    private void handleWin(int winnerCode, GameController controller, GameUI gameUI) {
+
+    private void handleWin(int winnerCode, GameController controller) {
         ResultHandler resultHandler = new ResultHandler(soundService);
         resultHandler.winner(winnerCode);
         new GameOverDialog(controller);
