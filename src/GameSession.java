@@ -53,22 +53,27 @@ public class GameSession {
         gameState.setDeck(new Deck(deckMode));
         participants.clear();
 
+        // 🔹 Use polymorphic references for all participants
+        GameParticipant<?> player = new HumanPlayer(gameState, this, gameUI, controller, cardService, gameLogicManager);
+        GameParticipant<?> bot = new SimpleBot(gameState, this, gameUI, controller, cardService, gameLogicManager);
+        GameParticipant<?> opponent = new LastBot(gameState, this, gameUI, controller, cardService, gameLogicManager);
 
-        HumanPlayer player = new HumanPlayer(gameState, this, gameUI, controller, cardService, gameLogicManager);
-        SimpleBot bot = new SimpleBot(gameState, this, gameUI, controller, cardService, gameLogicManager);
-        LastBot opponent = new LastBot(gameState, this, gameUI, controller, cardService, gameLogicManager);
-
+        // 🔹 Add to polymorphic collection
         participants.add(player);
         participants.add(bot);
         participants.add(opponent);
 
-
+        // 🔹 Map turns to participants using polymorphic references
         turnToParticipant.put(Turn.PLAYER, player);
         turnToParticipant.put(Turn.BOT, bot);
         turnToParticipant.put(Turn.OPPONENT, opponent);
 
-        this.botInstance = bot;
+        // 🔹 Save reference to actual bot instance (for auto-move)
+        if (bot instanceof SimpleBot simpleBot) {
+            this.botInstance = simpleBot;
+        }
 
+        // 🔹 Launch GUI and start game
         SwingUtilities.invokeLater(() -> {
             gameUI.createAndShowGUI();
             gameUI.updateImages();
@@ -76,11 +81,11 @@ public class GameSession {
         });
     }
 
+
     public void handleCardClick(int index) {
         if (!imageClicked) {
             clickedImageIndex = index;
             imageClicked = true;
-
 
             turnToParticipant.get(gameState.getTurn()).playCard(null);
 
