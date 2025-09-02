@@ -55,7 +55,7 @@ public class GameLogicManager {
         }
 
         if (emptyCount == 1) {
-            handleWin(winnerCode, controller); // Победа одного участника
+            handleWin(winnerCode, controller);
         }
     }
 

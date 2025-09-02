@@ -1,7 +1,5 @@
 import javax.swing.*;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class GameSession {
@@ -17,7 +15,7 @@ public class GameSession {
     private final TurnManager turnManager;
     private final int deckMode;
 
-    private final List<GameParticipant<?>> participants = new ArrayList<>();
+
     private final Map<Turn, GameParticipant<?>> turnToParticipant = new HashMap<>();
 
     public GameSession(
@@ -51,17 +49,15 @@ public class GameSession {
 
     public void startGame() {
         gameState.setDeck(new Deck(deckMode));
-        participants.clear();
+
 
         // 🔹 Use polymorphic references for all participants
         GameParticipant<?> player = new HumanPlayer(gameState, this, gameUI, controller, cardService, gameLogicManager);
         GameParticipant<?> bot = new SimpleBot(gameState, this, gameUI, controller, cardService, gameLogicManager);
         GameParticipant<?> opponent = new LastBot(gameState, this, gameUI, controller, cardService, gameLogicManager);
 
-        // 🔹 Add to polymorphic collection
-        participants.add(player);
-        participants.add(bot);
-        participants.add(opponent);
+
+
 
         // 🔹 Map turns to participants using polymorphic references
         turnToParticipant.put(Turn.PLAYER, player);
