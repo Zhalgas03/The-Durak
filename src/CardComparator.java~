@@ -1,0 +1,23 @@
+import java.util.Comparator;
+
+public class CardComparator implements Comparator<String> {
+    private final String trumpSuit;
+    private final CardService cardService;
+
+    public CardComparator(String trumpSuit, CardService cardService) {
+        this.trumpSuit = trumpSuit;
+        this.cardService = cardService;
+    }
+
+    @Override
+    public int compare(String card1, String card2) {
+        return Comparator
+                .comparingInt(this::isTrumpAsInt)              
+                .thenComparingInt(cardService::getCardRank)
+                .compare(card1, card2);
+    }
+
+    private int isTrumpAsInt(String card) {
+        return cardService.getCardSuit(card).equals(trumpSuit) ? 1 : 0;
+    }
+}

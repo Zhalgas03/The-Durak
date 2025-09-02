@@ -1,0 +1,54 @@
+// GameEngine.java
+public class GameEngine {
+    private final GameState state;
+    private final GameUI ui;
+
+    public GameEngine(GameState state, GameUI ui) {
+        this.state = state;
+        this.ui = ui;
+    }
+
+    public void startGame() {
+        state.updateFromVariables();
+        ui.render(state);
+    }
+
+    public void handlePlayerClick(int cardIndex) {
+        if (state.getCurrentTurn() != GameState.Turn.PLAYER) return;
+
+        GameParticipant<Integer> player = new Player52();
+        player.playCard(null);
+
+        state.updateFromVariables();
+        endTurn();
+    }
+
+    public void handleBotTurn() {
+        if (state.getCurrentTurn() != GameState.Turn.BOT) return;
+
+        GameParticipant<Integer> bot = new Bot52();
+        bot.playCard(null);
+
+        state.updateFromVariables();
+        endTurn();
+    }
+
+    public void handleOpponentTurn() {
+        if (state.getCurrentTurn() != GameState.Turn.OPPONENT) return;
+
+        GameParticipant<Integer> opponent = new Opponent();
+        opponent.playCard(null);
+
+        state.updateFromVariables();
+        endTurn();
+    }
+
+    private void endTurn() {
+        switch (state.getCurrentTurn()) {
+            case PLAYER -> state.setCurrentTurn(GameState.Turn.BOT);
+            case BOT -> state.setCurrentTurn(GameState.Turn.OPPONENT);
+            case OPPONENT -> state.setCurrentTurn(GameState.Turn.PLAYER);
+        }
+        ui.render(state);
+    }
+}

@@ -1,0 +1,127 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.List;
+
+public class GameUIManager {
+
+    public static void createAndShowGUI() {
+        JFrame frame = new JFrame("Durak");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setMinimumSize(new Dimension(1800, 1000));
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel botPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel durakPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel trump2 = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel info = new JPanel();
+        info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
+
+        panel.setBackground(Variables.getPanelColor());
+        botPanel.setBackground(Variables.getPanelColor());
+        trump2.setBackground(Variables.getPanelColor());
+        info.setBackground(Variables.getPanelColor());
+        durakPanel.setBackground(Variables.getPanelColor());
+        frame.getContentPane().setBackground(Variables.getPanelColor());
+
+        frame.add(panel, BorderLayout.SOUTH);
+        frame.add(botPanel, BorderLayout.NORTH);
+        frame.add(durakPanel, BorderLayout.EAST);
+        frame.add(trump2, BorderLayout.CENTER);
+        frame.add(info, BorderLayout.WEST);
+
+        trump2.setBorder(BorderFactory.createEmptyBorder(200, 75, 200, 200));
+        panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+        botPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
+        info.setBorder(BorderFactory.createEmptyBorder(210, 20, 0, 0));
+
+        Game52.setFrame(frame);
+        Game52.setPanels(panel, botPanel, durakPanel, trump2, info);
+
+        frame.setVisible(true);
+    }
+
+    public static void updateImages() {
+        JPanel panel = Game52.getPanel();
+        panel.removeAll();
+        addCardImagesToPanel(panel, Variables.getList(), false, true);
+
+        JPanel info = Game52.getInfoPanel();
+        info.removeAll();
+
+        JLabel deckCountLabel = new JLabel("Deck size:");
+        JLabel deckCountLabel2 = new JLabel(String.valueOf(Game52.getDeck().size()));
+        JLabel tlabel = getTrumpLabel();
+
+        deckCountLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        deckCountLabel.setForeground(Color.WHITE);
+        deckCountLabel2.setFont(new Font("Arial", Font.BOLD, 48));
+        deckCountLabel2.setForeground(Color.WHITE);
+        tlabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        deckCountLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        deckCountLabel2.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        info.add(tlabel);
+        info.add(deckCountLabel);
+        info.add(deckCountLabel2);
+
+        JPanel trump2 = Game52.getTrumpPanel();
+        trump2.removeAll();
+
+        ImageIcon midIcon = getMidIcon();
+        JLabel midLabel = new JLabel(midIcon);
+        trump2.add(midLabel);
+
+        midLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                GameMenu.playSound(Variables.getClickSoundPath());
+            }
+        });
+
+        JPanel botPanel = Game52.getBotPanel();
+        botPanel.removeAll();
+        addCardImagesToPanel(botPanel, Variables.getBot(), true, false);
+        botPanel.add(new JLabel(new ImageIcon("C:\\Users\\falco\\Desktop\\debil2\\cards\\separate.png")));
+        addCardImagesToPanel(botPanel, Variables.dList(), true, false);
+
+        Game52.getFrame().revalidate();
+        Game52.getFrame().repaint();
+    }
+
+    private static void addCardImagesToPanel(JPanel targetPanel, List<String> cards, boolean isHidden, boolean addClickListener) {
+        for (int i = 0; i < cards.size(); i++) {
+            ImageIcon icon = isHidden ?
+                    new ImageIcon("C:\\Users\\falco\\Desktop\\debil2\\cards\\BACK.png") :
+                    new ImageIcon("C:\\Users\\falco\\Desktop\\debil2\\cards\\" + cards.get(i) + ".png");
+
+            JLabel label = new JLabel(icon);
+            if (addClickListener) {
+                int index = i;
+                label.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        Game52.handlePlayerCardClick(index);
+                        GameMenu.playSound(Variables.getClickSoundPath());
+                    }
+                });
+            }
+            targetPanel.add(label);
+        }
+    }
+
+    private static JLabel getTrumpLabel() {
+        return new JLabel(new ImageIcon(Variables.getTrumpImagePath()));
+    }
+
+    private static ImageIcon getMidIcon() {
+        String path = switch (Game52.getTurn()) {
+            case PLAYER -> "BACK.png";
+            case BOT -> Variables.getBot().get(0) + ".png";
+            case OPPONENT -> Variables.dList().get(0) + ".png";
+        };
+        return new ImageIcon("C:\\Users\\falco\\Desktop\\debil2\\cards\\" + path);
+    }
+}

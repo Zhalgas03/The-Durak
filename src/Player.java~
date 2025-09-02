@@ -1,0 +1,73 @@
+public class Player extends GameParticipant<Card> {// The Player class extends the GameParticipant class
+    // Override the abstract playCard method from GameParticipant
+    private final GameUI gameUI;
+    @Override
+    public void playCard(Card card) { // Implementation of the playCard method
+        int index = MainBeta2.clickedImageIndex;// Get the index of the clicked image
+
+        //remove and store card from player list and trim to size
+        String a = GameData.getList().remove(index);
+        GameData.getList().trimToSize();
+
+        //splits into rank and suit
+        String[] words = a.split("\\s+");
+        boolean found = false;
+        String w = words[1];
+        String n = words[0];
+        int n1 = CardUtils.rankValue(n);//makes rank into int
+        int i, nv;
+
+        //find stronger card in bot list
+        for (i = 0; i < GameData.getBot().size(); i++) {
+            String element = GameData.getBot().get(i);
+            if (element.contains(w)) {
+                String[] Bwords = element.split("\\s+");
+                String v = Bwords[0];
+                nv = CardUtils.rankValue(v);
+                if (nv > n1) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        //checks if bot has trump and can beat card
+        if (!found) {
+            for (i = 0; i < GameData.getBot().size(); i++) {
+                String t = GameData.getBot().get(i);
+                if (t.contains(GameData.getTrump()) && !a.contains(GameData.getTrump())) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        //gives cards after each round
+        if (MainBeta2.deck.size() > 0 && GameData.getList().size() < 6) {
+            GameLogicUtils.give(MainBeta2.deck, GameData.getList());
+        }
+
+        if (found) {//if bot beat card
+            GameData.getBot().remove(i);
+            GameData.getBot().trimToSize();
+            //adds card to bot list if bot has less than 6 cards
+            if (GameData.getBot().size() < 6 && MainBeta2.deck.size() > 0) {
+                Card card1 = MainBeta2.deck.drawCard();
+                GameData.getBot().add(String.valueOf(card1));
+            }
+            MainBeta2.setTurn(false);//bot's turn
+
+        } else {//if bot can't beat card
+            GameData.getBot().add(a);
+            MainBeta2.setTurn(true);
+        }
+        //sort cards
+        GameData.getList().sort(new CardUtils.CardComparator());
+        GameData.getBot().sort(new CardUtils.CardComparator());
+        GameLogicUtils.endGame(GameData.getList(), GameData.getBot(), null, true);
+
+
+    }
+
+
+
+}
+
