@@ -15,7 +15,6 @@ public class Main {
         TurnManager turnManager = new TurnManager(cardService);
         GameLogicManager gameLogicManager = new GameLogicManager(cardService, soundService);
 
-
         GameSession gameSession = new GameSession(
                 soundService,
                 cardService,
@@ -25,5 +24,6 @@ public class Main {
         );
 
         gameSession.startGame();
+
     }
 }

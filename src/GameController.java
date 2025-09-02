@@ -10,6 +10,7 @@ public class GameController implements GameStateProvider, TurnManagerCallback {
     private final HandSorter handSorter;
     private final SoundService soundService;
     private int currentDeckMode = 36;
+
     public GameController(
             GameUI gameUI,
             GameState gameState,
@@ -24,8 +25,8 @@ public class GameController implements GameStateProvider, TurnManagerCallback {
         this.game = game;
         this.cardService = cardService;
         this.soundService = soundService;
-        this.gameInitializer = new GameInitializer(new Dealer(), gameState, game, cardService, turnManager, gameUI, this, gameLogicManager);        this.handSorter = new HandSorter();
-        updateCardComparator();
+        this.gameInitializer = new GameInitializer(new Dealer(), gameState, game, cardService, turnManager, gameUI, this, gameLogicManager);
+        this.handSorter = new HandSorter();
     }
     public void setGameUI(GameUI gameUI) {
         this.gameUI = gameUI;
@@ -53,6 +54,7 @@ public class GameController implements GameStateProvider, TurnManagerCallback {
     public void initGame(int deckMode) {
         setDeckMode(deckMode);
         gameInitializer.prepareNewGame(this, deckMode);
+        updateCardComparator();
         soundService.playGameTheme();
     }
 
@@ -63,11 +65,14 @@ public class GameController implements GameStateProvider, TurnManagerCallback {
         soundService.playGameTheme();
     }
 
-    public void updateCardComparator() {
+    public void  updateCardComparator() {
         cardComparator = cardService.createCardComparator(gameState.getTrump());
     }
 
     public void sortAllHands() {
         handSorter.sortHands(gameState.getPlayerHand(), gameState.getBotHand(), gameState.getDurakHand(), cardComparator);
     }
+
+
 }
+

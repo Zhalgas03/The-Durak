@@ -118,7 +118,7 @@ public class GameSession {
     public void setTurn(GameSession.Turn t) {
         gameState.setTurn(t);
 
-        // 🔹 Ход бота автоматом
+
         if (t == Turn.BOT && botInstance != null) {
             SwingUtilities.invokeLater(() -> {
                 botInstance.playCard(null);
