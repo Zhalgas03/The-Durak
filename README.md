@@ -74,5 +74,5 @@ Pause overlay with resume, restart, or exit options.
 ---
 
 ## 📌 Repository
-👉 [GitHub: Zhalgas03/DurakGame](https://github.com/Zhalgas03/The-Durak)
+👉 [GitHub: Zhalgas03/The-Durak](https://github.com/Zhalgas03/The-Durak)
 
